@@ -25,7 +25,29 @@ function addToList(text) {
  * @returns {Promise<string>} le résultat de promiseFn
  */
 function retryWithBackoff(promiseFn, maxRetries) {
-    return Promise.resolve(`TODO: implémenter ${arguments.callee.name}`);
+    
+    return new Promise((resolve, reject) => {
+        const retry = (attempt) => {
+
+            promiseFn().then((value) => {
+                resolve(value);
+            })
+            .catch((error) => {
+                if(attempt < maxRetries){
+                    const delay = 100 * Math.pow(2, attempt);
+                    addToList(`Nouvelle demande apres ${delay}`)
+                    setTimeout(retry(attempt + 1), delay);
+                }else{
+                    reject(error);
+                }
+             });
+
+        }
+       
+        retry(0);
+    });
+   
+
 }
 
 // Simulation d'appel à un serveur
